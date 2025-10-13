@@ -1,0 +1,162 @@
+name: PromptAPI Docker Build
+run-name: PromptAPI ${{ github.event.inputs.environment }}-${{ github.event.inputs.tag }}-${{ github.run_number }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - prod
+      tag:
+        description: 'Docker image tag (will be appended with build number)'
+        required: false
+        default: 'latest'
+        type: string
+
+env:
+  AWS_REGION: us-west-2
+  ECR_REPOSITORY: 411429114957.dkr.ecr.us-west-2.amazonaws.com/promptver/promptapi
+  SERVICE_NAME: promptapi
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    outputs:
+      image_uri: ${{ steps.build-image.outputs.image_uri }}
+      image_tag: ${{ steps.tag.outputs.image_tag }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npx nx test promptapi
+
+      - name: Run linting
+        run: npx nx lint promptapi
+
+      - name: Build application
+        run: npx nx build promptapi --prod
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate image tag
+        id: tag
+        run: |
+          ENVIRONMENT=${{ github.event.inputs.environment || 'dev' }}
+          CUSTOM_TAG=${{ github.event.inputs.tag || 'latest' }}
+          BUILD_NUMBER=${{ github.run_number }}
+          
+          # Generate single tag with the requested format
+          echo "image_tag=${ENVIRONMENT}-${CUSTOM_TAG}-${BUILD_NUMBER}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        id: build-image
+        run: |
+          # Build the Docker image with single tag
+          docker buildx build \
+            --platform linux/amd64 \
+            --tag ${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.image_tag }} \
+            --file packages/promptapi/promptapi.Dockerfile \
+            --load \
+            .
+          
+          echo "image_uri=${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.image_tag }}" >> $GITHUB_OUTPUT
+
+      - name: Push Docker image to ECR
+        run: |
+          # Push the single tag
+          docker push ${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
+
+      - name: Output deployment info
+        run: |
+          echo "🚀 **Deployment Summary - ${{ steps.tag.outputs.image_tag }}**" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service**: ${{ env.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.environment || 'dev' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image URI**: ${{ steps.build-image.outputs.image_uri }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: \`${{ steps.tag.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
+
+  # security-scan:
+  #   runs-on: ubuntu-latest
+  #   needs: build-and-deploy
+  #   if: github.event.inputs.environment == 'prod' || github.ref == 'refs/heads/main'
+    
+  #   steps:
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ env.AWS_REGION }}
+
+  #     - name: Login to Amazon ECR
+  #       uses: aws-actions/amazon-ecr-login@v2
+
+  #     - name: Run Trivy vulnerability scanner
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: ${{ needs.build-and-deploy.outputs.image_uri }}
+  #         format: 'sarif'
+  #         output: 'trivy-results.sarif'
+  #         exit-code: '0'  # Don't fail the action on vulnerabilities
+  #       continue-on-error: true
+
+  #     - name: Check if SARIF file exists
+  #       id: check-sarif
+  #       run: |
+  #         if [ -f "trivy-results.sarif" ]; then
+  #           echo "sarif_exists=true" >> $GITHUB_OUTPUT
+  #           echo "✅ SARIF file created successfully"
+  #         else
+  #           echo "sarif_exists=false" >> $GITHUB_OUTPUT
+  #           echo "❌ SARIF file was not created"
+  #           ls -la
+  #         fi
+
+  #     - name: Upload Trivy scan results to GitHub Security tab
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       if: steps.check-sarif.outputs.sarif_exists == 'true'
+  #       with:
+  #         sarif_file: 'trivy-results.sarif'
+
+  #     - name: Security scan summary
+  #       run: |
+  #         echo "🔒 **Security Scan Summary**" >> $GITHUB_STEP_SUMMARY
+  #         echo "- **Image Scanned**: ${{ needs.build-and-deploy.outputs.image_uri }}" >> $GITHUB_STEP_SUMMARY
+  #         if [ "${{ steps.check-sarif.outputs.sarif_exists }}" == "true" ]; then
+  #           echo "- **Status**: ✅ Scan completed successfully" >> $GITHUB_STEP_SUMMARY
+  #           echo "- **Results**: Check the Security tab for detailed findings" >> $GITHUB_STEP_SUMMARY
+  #         else
+  #           echo "- **Status**: ❌ Scan failed to generate results" >> $GITHUB_STEP_SUMMARY
+  #           echo "- **Action**: Check the workflow logs for details" >> $GITHUB_STEP_SUMMARY
+  #         fi
