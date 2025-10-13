@@ -1,0 +1,10 @@
+{
+  "name": "@openai-apps-sdk-nx/openai-apps-sdk-nx-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@openai-apps-sdk-nx/openai-apps-sdk-nx"
+    ]
+  }
+}
