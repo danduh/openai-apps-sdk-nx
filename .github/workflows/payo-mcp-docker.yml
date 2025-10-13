@@ -82,10 +82,11 @@ jobs:
       - name: Build Docker image
         id: build-image
         run: |
-          # Build the Docker image with single tag
+          # Build the Docker image with multiple tags
           docker buildx build \
             --platform linux/amd64 \
             --tag ${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.image_tag }} \
+            --tag ${{ env.ECR_REPOSITORY }}:latest \
             --file apps/payo-mcp/Dockerfile \
             --load \
             .
@@ -94,8 +95,9 @@ jobs:
 
       - name: Push Docker image to ECR
         run: |
-          # Push the single tag
+          # Push both tags
           docker push ${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
+          docker push ${{ env.ECR_REPOSITORY }}:latest
 
       - name: Output deployment info
         run: |
