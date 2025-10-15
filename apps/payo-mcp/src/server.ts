@@ -42,6 +42,18 @@ function widgetMeta(widget: PizzazWidget) {
 
 const widgets: PizzazWidget[] = [
   {
+    id: "payo-balances",
+    title: "Show customer Balances",
+    templateUri: "ui://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_balance/index.html",
+    invoking: "Showing customer balances",
+    invoked: "Customer balances displayed",
+    html: `
+<div id="root"></div>
+<script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_balance/main.e579d2bc8bfde4d7.js"></script>
+    `.trim(),
+    responseText: "Rendered customer balances!"
+  },
+  {
     id: "pizza-map",
     title: "Show Pizza Map",
     templateUri: "ui://widget/pizza-map.html",

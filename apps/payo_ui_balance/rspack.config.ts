@@ -10,7 +10,7 @@ import config from './module-federation.config';
 
 export default {
   output: {
-    path: join(__dirname, 'dist'),
+    path: join(__dirname, '../../dist/payo_ui_balance'),
     publicPath: 'auto',
   },
   devServer: {
@@ -29,7 +29,7 @@ export default {
       tsConfig: './tsconfig.app.json',
       main: './src/main.ts',
       index: './src/index.html',
-      baseHref: '/',
+      baseHref: '/openapi-apps/payo_ui_balance/',
       assets: ['./src/favicon.ico', './src/assets'],
       styles: ['./src/styles.css'],
       outputHashing: process.env['NODE_ENV'] === 'production' ? 'all' : 'none',
