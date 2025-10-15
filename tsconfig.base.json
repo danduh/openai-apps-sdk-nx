@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "composite": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
@@ -16,6 +17,9 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@openai-apps-sdk-nx/source"]
+    "customConditions": ["@openai-apps-sdk-nx/source"],
+    "paths": {
+      "payo_ui_balance/Module": ["apps/payo_ui_balance/src/remote-entry.ts"]
+    }
   }
 }
