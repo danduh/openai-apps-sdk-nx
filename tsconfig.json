@@ -17,6 +17,12 @@
     },
     {
       "path": "./apps/payo_ui_balance"
+    },
+    {
+      "path": "./apps/payo_ui_map"
+    },
+    {
+      "path": "./libs/openai-tools"
     }
   ]
 }

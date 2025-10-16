@@ -19,7 +19,9 @@
     "target": "es2022",
     "customConditions": ["@openai-apps-sdk-nx/source"],
     "paths": {
-      "payo_ui_balance/Module": ["apps/payo_ui_balance/src/remote-entry.ts"]
+      "@payo/openai-tools": ["libs/openai-tools/src/index.ts"],
+      "payo_ui_balance/Module": ["apps/payo_ui_balance/src/remote-entry.ts"],
+      "payo_ui_map/Module": ["apps/payo_ui_map/src/remote-entry.ts"]
     }
   }
 }
