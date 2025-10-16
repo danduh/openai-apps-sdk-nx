@@ -7,7 +7,7 @@
   "targets": {
     "serve": {
       "options": {
-        "port": 4201
+        "port": 4204
       },
       "dependsOn": ["typecheck"]
     },

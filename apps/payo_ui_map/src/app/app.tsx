@@ -21,22 +21,15 @@ export function useWidgetProps<T extends Record<string, unknown>>(
 }
 
 export function App() {
-  const { test_text } = useWidgetProps({ test_text: 'default text' });
+  const toolOutputData = window?.openai?.toolOutput?.data as BankAccountFormData | undefined;
   
-  
-  console.log(
-    'test_text from widget props:',
-    test_text ? test_text : 'no props found'
-  );
-
-  console.log('places from tool output:', window?.openai?.toolOutput);
+  console.log('Tool output data:', toolOutputData);
 
   const [formData, setFormData] = useState<BankAccountFormData>({
-    bankName: '',
-    accountHolder: '',
-    accountNumber: '',
-    swiftBic: '',
-    confirmed: false,
+    recipientEmail: toolOutputData?.recipientEmail || '',
+    amount: toolOutputData?.amount || '',
+    currency: toolOutputData?.currency || 'USD',
+    confirmed: toolOutputData?.confirmed || false,
   });
 
   return (

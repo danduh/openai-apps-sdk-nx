@@ -1,45 +1,39 @@
 import { z } from 'zod';
 
 /**
- * Bank Account Form Data Schema
- * - bankName: optional string
- * - accountHolder: required string
- * - accountNumber: optional string
- * - swiftBic: optional string
+ * Transfer Money Form Data Schema
+ * - recipientEmail: required string (email address)
+ * - amount: required string (monetary amount)
+ * - currency: optional string (defaults to USD)
  * - confirmed: optional boolean
  */
 export const makeAPaymentFormSchema = {
   type: 'object',
   properties: {
-    bankName: {
+    recipientEmail: {
       type: 'string',
-      description: 'Name of the bank',
+      description: 'Email address of the recipient (required)',
     },
-    accountHolder: {
+    amount: {
       type: 'string',
-      description: 'Name of the account holder (required). Person name',
+      description: 'Amount to transfer (required)',
     },
-    accountNumber: {
+    currency: {
       type: 'string',
-      description: 'Bank account number',
-    },
-    swiftBic: {
-      type: 'string',
-      description: 'SWIFT/BIC code for international transfers',
+      description: 'Currency code (e.g., USD, EUR). Defaults to USD',
     },
     confirmed: {
       type: 'boolean',
-      description: 'Whether the user has confirmed the bank account details',
+      description: 'Whether the user has confirmed the transfer details',
     },
   },
-  required: ['accountHolder'],
+  required: ['recipientEmail', 'amount'],
   additionalProperties: false,
 } as const;
 
 export const makeAPaymentFormParser = z.object({
-  bankName: z.string().optional(),
-  accountHolder: z.string(),
-  accountNumber: z.string().optional(),
-  swiftBic: z.string().optional(),
+  recipientEmail: z.string().email(),
+  amount: z.string(),
+  currency: z.string().optional().default('USD'),
   confirmed: z.boolean().optional(),
 });

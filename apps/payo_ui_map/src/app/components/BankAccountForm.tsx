@@ -2,10 +2,9 @@ import { InputField } from './InputField';
 import { Checkbox } from './Checkbox';
 
 export interface BankAccountFormData {
-  bankName: string;
-  accountHolder: string;
-  accountNumber: string;
-  swiftBic: string;
+  recipientEmail: string;
+  amount: string;
+  currency: string;
   confirmed: boolean;
 }
 
@@ -27,35 +26,29 @@ export function BankAccountForm({ data, onChange }: BankAccountFormProps) {
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-[500px]">
+      <h2 className="text-2xl font-bold text-[#252526] mb-2">Transfer Money</h2>
+      
       <InputField
-        label="Bank name"
-        value={data.bankName}
-        onChange={(value) => updateField('bankName', value)}
-        placeholder="Bank of America"
+        label="Recipient Email"
+        value={data.recipientEmail}
+        onChange={(value) => updateField('recipientEmail', value)}
+        placeholder="recipient@example.com"
+        icon="✉️"
       />
 
       <InputField
-        label="Account holder name"
-        value={data.accountHolder}
-        onChange={(value) => updateField('accountHolder', value)}
-        placeholder="Placeholder"
-        icon="👤"
+        label="Amount"
+        value={data.amount}
+        onChange={(value) => updateField('amount', value)}
+        placeholder="0.00"
+        icon="💰"
       />
 
       <InputField
-        label="Account number"
-        value={data.accountNumber}
-        onChange={(value) => updateField('accountNumber', value)}
-        placeholder="e.g. 214558"
-        icon="ℹ️"
-      />
-
-      <InputField
-        label="SWIFT/BIC"
-        value={data.swiftBic}
-        onChange={(value) => updateField('swiftBic', value)}
-        placeholder="BOFAUS6NXXX"
-        icon="ℹ️"
+        label="Currency"
+        value={data.currency}
+        onChange={(value) => updateField('currency', value)}
+        placeholder="USD"
       />
 
       <div className="flex gap-2.5 items-center">
@@ -64,7 +57,7 @@ export function BankAccountForm({ data, onChange }: BankAccountFormProps) {
           onChange={(value) => updateField('confirmed', value)}
         />
         <label className="text-sm font-medium text-[#252526] leading-[1.43]">
-          I confirm the bank account details above
+          I confirm the transfer details above
         </label>
       </div>
     </div>
