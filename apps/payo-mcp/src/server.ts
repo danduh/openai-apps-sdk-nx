@@ -22,7 +22,7 @@ import {
   type ResourceTemplate,
   type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
-import { z } from 'zod';
+import { makeAPaymentFormParser, makeAPaymentFormSchema } from './schemas';
 
 type PizzazWidget = {
   id: string;
@@ -32,6 +32,8 @@ type PizzazWidget = {
   invoked: string;
   html: string;
   responseText: string;
+  inputSchema?: any;
+  inputSchemaParser?: any;
 };
 
 function widgetMeta(widget: PizzazWidget) {
@@ -43,24 +45,6 @@ function widgetMeta(widget: PizzazWidget) {
     'openai/resultCanProduceWidget': true,
   } as const;
 }
-
-//   {
-//     id: "payo-map",
-//     title: "Make a Payment", // Make a Payment => "map"
-//     templateUri: "ui://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_map/index.html",
-//     invoking: "MAP",
-//     invoked: "Served Make a Payment Form",
-//     html: `
-// <div id="root"></div>
-// <script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_map/main.e579d2bc8bfde4d7.js"></script>
-//     `.trim(),
-//     responseText: "Rendered a MAP form!",
-//     async () => {
-//       return {
-//         structuredContent:{ exampleKey: "exampleValue" }
-//       }
-//     }
-//   },
 
 const widgets: PizzazWidget[] = [
   {
@@ -88,6 +72,8 @@ const widgets: PizzazWidget[] = [
   <script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_map/main.3d6c04a7f927f442.js"></script>
       `.trim(),
     responseText: 'Rendered a MAP form!',
+    inputSchema: makeAPaymentFormSchema,
+    inputSchemaParser: makeAPaymentFormParser
   },
   {
     id: 'pizza-carousel',
@@ -151,26 +137,11 @@ widgets.forEach((widget) => {
   widgetsByUri.set(widget.templateUri, widget);
 });
 
-const toolInputSchema = {
-  type: 'object',
-  properties: {
-    pizzaTopping: {
-      type: 'string',
-      description: 'Topping to mention when rendering the widget.',
-    },
-  },
-  required: ['pizzaTopping'],
-  additionalProperties: false,
-} as const;
-
-const toolInputParser = z.object({
-  pizzaTopping: z.string(),
-});
 
 const tools: Tool[] = widgets.map((widget) => ({
   name: widget.id,
   description: widget.title,
-  inputSchema: toolInputSchema,
+  inputSchema: widget.inputSchema,
   title: widget.title,
   _meta: widgetMeta(widget),
 }));
@@ -194,8 +165,8 @@ const resourceTemplates: ResourceTemplate[] = widgets.map((widget) => ({
 function createPizzazServer(): Server {
   const server = new Server(
     {
-      name: 'pizzaz-node',
-      version: '0.1.0',
+      name: 'payo-node',
+      version: '0.1.1',
     },
     {
       capabilities: {
@@ -256,8 +227,7 @@ function createPizzazServer(): Server {
       if (!widget) {
         throw new Error(`Unknown tool: ${request.params.name}`);
       }
-
-      const args = toolInputParser.parse(request.params.arguments ?? {});
+      const args = widget?.inputSchemaParser.parse(request.params.arguments ?? {}) ?? {};
 
       return {
         content: [
@@ -267,7 +237,7 @@ function createPizzazServer(): Server {
           },
         ],
         structuredContent: {
-          pizzaTopping: args.pizzaTopping, /// ???
+          data: args
         },
         _meta: widgetMeta(widget),
       };
