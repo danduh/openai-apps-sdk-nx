@@ -226,7 +226,7 @@ function createPizzazServer(): Server {
       if (!widget) {
         throw new Error(`Unknown tool: ${request.params.name}`);
       }
-      const args = widget?.inputSchemaParser.parse(request.params.arguments ?? {}) ?? {};
+      const args = widget?.inputSchemaParser?.parse(request.params.arguments ?? {}) ?? {};
 
       return {
         content: [
