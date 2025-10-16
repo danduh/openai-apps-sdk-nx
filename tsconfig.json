@@ -4,16 +4,7 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/openai-apps-sdk-nx-e2e"
-    },
-    {
-      "path": "./apps/openai-apps-sdk-nx"
-    },
-    {
       "path": "./apps/payo-mcp"
-    },
-    {
-      "path": "./apps/payo_ui_balance-e2e"
     },
     {
       "path": "./apps/payo_ui_balance"
