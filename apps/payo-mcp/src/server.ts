@@ -16,7 +16,6 @@ import {
   type CallToolRequest,
   type ListResourceTemplatesRequest,
   type ListResourcesRequest,
-  type ListToolsRequest,
   type ReadResourceRequest,
   type Resource,
   type ResourceTemplate,
@@ -141,7 +140,7 @@ widgets.forEach((widget) => {
 const tools: Tool[] = widgets.map((widget) => ({
   name: widget.id,
   description: widget.title,
-  inputSchema: widget.inputSchema,
+  inputSchema: widget.inputSchema ?? {"type": "object", "properties": {}},
   title: widget.title,
   _meta: widgetMeta(widget),
 }));
@@ -214,7 +213,7 @@ function createPizzazServer(): Server {
 
   server.setRequestHandler(
     ListToolsRequestSchema,
-    async (_request: ListToolsRequest) => ({
+    async (/* _request: ListToolsRequest */) => ({
       tools,
     })
   );
