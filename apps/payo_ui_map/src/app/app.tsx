@@ -29,6 +29,8 @@ export function App() {
     test_text ? test_text : 'no props found'
   );
 
+  console.log('places from tool output:', window?.openai?.toolOutput);
+
   const [formData, setFormData] = useState<BankAccountFormData>({
     bankName: '',
     accountHolder: '',

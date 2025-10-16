@@ -85,7 +85,7 @@ const widgets: PizzazWidget[] = [
     invoked: 'Served Make a Payment Form',
     html: `
   <div id="root"></div>
-  <script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_map/main.956926780aa15992.js"></script>
+  <script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_map/main.3d6c04a7f927f442.js"></script>
       `.trim(),
     responseText: 'Rendered a MAP form!',
   },
