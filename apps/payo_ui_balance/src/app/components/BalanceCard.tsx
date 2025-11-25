@@ -8,6 +8,7 @@ interface BalanceCardProps {
   icon?: 'flag' | 'cards';
   disabled?: boolean;
   disabledMessage?: string;
+  onClick?: () => void | Promise<void>;
 }
 
 export function BalanceCard({
@@ -17,6 +18,7 @@ export function BalanceCard({
   icon = 'flag',
   disabled = false,
   disabledMessage,
+  onClick,
 }: BalanceCardProps) {
   // Adjust height based on disabled state
   const cardHeight = disabled ? 'h-[84px]' : 'h-16';
@@ -24,11 +26,8 @@ export function BalanceCard({
   const handleCardClick = async () => {
     if (disabled) return;
     
-    try {
-      const result = await window.openai.requestDisplayMode({ mode: 'fullscreen' });
-      console.log('Display mode changed to:', result.mode);
-    } catch (error) {
-      console.error('Failed to request fullscreen:', error);
+    if (onClick) {
+      await onClick();
     }
   };
   
