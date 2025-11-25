@@ -23,7 +23,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { makeAPaymentFormParser, makeAPaymentFormSchema } from './schemas';
 
-type PizzazWidget = {
+type PayoWidget = {
   id: string;
   title: string;
   templateUri: string;
@@ -35,7 +35,7 @@ type PizzazWidget = {
   inputSchemaParser?: any;
 };
 
-function widgetMeta(widget: PizzazWidget) {
+function widgetMeta(widget: PayoWidget) {
   return {
     'openai/outputTemplate': widget.templateUri,
     'openai/toolInvocation/invoking': widget.invoking,
@@ -45,7 +45,7 @@ function widgetMeta(widget: PizzazWidget) {
   } as const;
 }
 
-const widgets: PizzazWidget[] = [
+const widgets: PayoWidget[] = [
   {
     id: 'payo-balances',
     title: 'Show customer Balances',
@@ -55,13 +55,13 @@ const widgets: PizzazWidget[] = [
     invoked: 'Customer balances displayed',
     html: `
 <div id="root"></div>
-<script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_balance/main.e579d2bc8bfde4d7.js"></script>
+<script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_balance/main.5d13da1771faaad4.js"></script>
     `.trim(),
     responseText: 'Rendered customer balances!',
   },
   {
     id: 'payo-map',
-    title: 'Make a Payment', // Make a Payment => "map"
+    title: 'Make a Payment',
     templateUri:
       'ui://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_map/index.html',
     invoking: 'MAP',
@@ -73,63 +73,11 @@ const widgets: PizzazWidget[] = [
     responseText: 'Rendered a MAP form!',
     inputSchema: makeAPaymentFormSchema,
     inputSchemaParser: makeAPaymentFormParser
-  },
-  {
-    id: 'pizza-carousel',
-    title: 'Show Pizza Carousel',
-    templateUri: 'ui://widget/pizza-carousel.html',
-    invoking: 'Carousel some spots',
-    invoked: 'Served a fresh carousel',
-    html: `
-<div id="pizzaz-carousel-root"></div>
-<link rel="stylesheet" href="https://persistent.oaistatic.com/ecosystem-built-assets/pizzaz-carousel-0038.css">
-<script type="module" src="https://persistent.oaistatic.com/ecosystem-built-assets/pizzaz-carousel-0038.js"></script>
-    `.trim(),
-    responseText: 'Rendered a pizza carousel!',
-  },
-  {
-    id: 'pizza-albums',
-    title: 'Show Pizza Album',
-    templateUri: 'ui://widget/pizza-albums.html',
-    invoking: 'Hand-tossing an album',
-    invoked: 'Served a fresh album',
-    html: `
-<div id="pizzaz-albums-root"></div>
-<link rel="stylesheet" href="https://persistent.oaistatic.com/ecosystem-built-assets/pizzaz-albums-0038.css">
-<script type="module" src="https://persistent.oaistatic.com/ecosystem-built-assets/pizzaz-albums-0038.js"></script>
-    `.trim(),
-    responseText: 'Rendered a pizza album!',
-  },
-  {
-    id: 'pizza-list',
-    title: 'Show Pizza List',
-    templateUri: 'ui://widget/pizza-list.html',
-    invoking: 'Hand-tossing a list',
-    invoked: 'Served a fresh list',
-    html: `
-<div id="pizzaz-list-root"></div>
-<link rel="stylesheet" href="https://persistent.oaistatic.com/ecosystem-built-assets/pizzaz-list-0038.css">
-<script type="module" src="https://persistent.oaistatic.com/ecosystem-built-assets/pizzaz-list-0038.js"></script>
-    `.trim(),
-    responseText: 'Rendered a pizza list!',
-  },
-  {
-    id: 'pizza-video',
-    title: 'Show Pizza Video',
-    templateUri: 'ui://widget/pizza-video.html',
-    invoking: 'Hand-tossing a video',
-    invoked: 'Served a fresh video',
-    html: `
-<div id="pizzaz-video-root"></div>
-<link rel="stylesheet" href="https://persistent.oaistatic.com/ecosystem-built-assets/pizzaz-video-0038.css">
-<script type="module" src="https://persistent.oaistatic.com/ecosystem-built-assets/pizzaz-video-0038.js"></script>
-    `.trim(),
-    responseText: 'Rendered a pizza video!',
-  },
+  }
 ];
 
-const widgetsById = new Map<string, PizzazWidget>();
-const widgetsByUri = new Map<string, PizzazWidget>();
+const widgetsById = new Map<string, PayoWidget>();
+const widgetsByUri = new Map<string, PayoWidget>();
 
 widgets.forEach((widget) => {
   widgetsById.set(widget.id, widget);
@@ -161,7 +109,7 @@ const resourceTemplates: ResourceTemplate[] = widgets.map((widget) => ({
   _meta: widgetMeta(widget),
 }));
 
-function createPizzazServer(): Server {
+function createPayozServer(): Server {
   const server = new Server(
     {
       name: 'payo-node',
@@ -258,7 +206,7 @@ const postPath = '/mcp/messages';
 
 async function handleSseRequest(res: ServerResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  const server = createPizzazServer();
+  const server = createPayozServer();
   const transport = new SSEServerTransport(postPath, res);
   const sessionId = transport.sessionId;
 
@@ -360,7 +308,7 @@ httpServer.on('clientError', (err: Error, socket) => {
 });
 
 httpServer.listen(port, () => {
-  console.log(`Pizzaz MCP server listening on http://localhost:${port}`);
+  console.log(`Payo MCP server listening on http://localhost:${port}`);
   console.log(`  SSE stream: GET http://localhost:${port}${ssePath}`);
   console.log(
     `  Message post endpoint: POST http://localhost:${port}${postPath}?sessionId=...`

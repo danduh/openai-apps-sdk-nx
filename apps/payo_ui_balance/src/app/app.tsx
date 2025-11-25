@@ -11,9 +11,9 @@ export function App() {
     },
     {
       amount: '500.00',
-      currency: 'USD',
+      currency: 'EUR',
       icon: 'flag' as const,
-      flagIcon: 'https://flagcdn.com/w40/gb.png',
+      flagIcon: 'https://flagcdn.com/w40/eu.png',
       disabled: true,
       disabledMessage: 'Balance disabled',
     },

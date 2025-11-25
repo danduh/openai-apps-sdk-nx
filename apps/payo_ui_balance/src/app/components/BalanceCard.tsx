@@ -1,3 +1,6 @@
+// Import to ensure OpenAI global types are loaded
+import '@payo/openai-tools';
+
 interface BalanceCardProps {
   amount: string;
   currency: string;
@@ -18,10 +21,24 @@ export function BalanceCard({
   // Adjust height based on disabled state
   const cardHeight = disabled ? 'h-[84px]' : 'h-16';
   
+  const handleCardClick = async () => {
+    if (disabled) return;
+    
+    try {
+      const result = await window.openai.requestDisplayMode({ mode: 'fullscreen' });
+      console.log('Display mode changed to:', result.mode);
+    } catch (error) {
+      console.error('Failed to request fullscreen:', error);
+    }
+  };
+  
   return (
-    <div className={`relative w-full ${cardHeight}`}>
+    <div 
+      className={`relative w-full ${cardHeight} ${!disabled ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+      onClick={handleCardClick}
+    >
       {/* Card container */}
-      <div className="absolute inset-0 bg-white rounded-lg shadow-[0px_1px_8px_0px_rgba(0,0,0,0.2)]" />
+      <div className={`absolute inset-0 bg-white rounded-lg shadow-[0px_1px_8px_0px_rgba(0,0,0,0.2)] transition-all duration-200 ${!disabled ? 'hover:shadow-[0px_2px_12px_0px_rgba(0,0,0,0.3)] hover:scale-[1.01]' : ''}`} />
 
       {/* Flag/Icon container */}
       <div className="absolute left-4 top-4 w-8 h-8">

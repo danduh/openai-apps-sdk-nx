@@ -20,18 +20,28 @@ export type OpenAiGlobals<
   toolOutput: ToolOutput | null;
   toolResponseMetadata: ToolResponseMetadata | null;
   widgetState: WidgetState | null;
-  setWidgetState: (state: WidgetState) => Promise<void>;
 };
 
 // currently copied from types.ts in chatgpt/web-sandbox.
 // Will eventually use a public package.
-type API = {
+type API<WidgetState = UnknownObject> = {
+  /** Calls a tool on your MCP. Returns the full response. */
   callTool: CallTool;
+  
+  /** Ask the host to close the widget container */
+  requestClose: () => void;
+  
+  /** Triggers a followup turn in the ChatGPT conversation */
   sendFollowUpMessage: (args: { prompt: string }) => Promise<void>;
+  
+  /** Opens an external link, redirects web page or mobile app */
   openExternal(payload: { href: string }): void;
 
-  // Layout controls
+  /** For transitioning an app from inline to fullscreen or pip */
   requestDisplayMode: RequestDisplayMode;
+  
+  /** Updates the internal state of the widget */
+  setWidgetState: (state: WidgetState) => Promise<void>;
 };
 
 export type UnknownObject = Record<string, unknown>;
@@ -99,3 +109,6 @@ declare global {
     [SET_GLOBALS_EVENT_TYPE]: SetGlobalsEvent;
   }
 }
+
+// This export is necessary to make the global declaration work in a module context
+export {};
