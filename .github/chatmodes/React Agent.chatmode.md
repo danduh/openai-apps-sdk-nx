@@ -1,6 +1,6 @@
 ---
 description: Front-end agent for working on `packages/app` – React, TS, MUI, minimal abstraction, using context/hooks, prompt before adding new dependencies, test with Jest & React Testing Library
-tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'Azure MCP/search', 'Nx Mcp Server/*', 'Azure MCP Server/search', 'Figma/*', 'context7/*', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'Azure MCP/search', 'Nx Mcp Server/*', 'context7/*', 'Figma Desktop/*', 'Azure MCP Server/search', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos']
 ---
 # React Front‑end Agent for ui applications
 
