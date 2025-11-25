@@ -55,7 +55,7 @@ const widgets: PayoWidget[] = [
     invoked: 'Customer balances displayed',
     html: `
 <div id="root"></div>
-<script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_balance/main.5d13da1771faaad4.js"></script>
+<script type="module" src="https://d20hg2q9c0qj9d.cloudfront.net/openapi-apps/payo_ui_balance/main.41a1d9a346cf0543.js"></script>
     `.trim(),
     responseText: 'Rendered customer balances!',
   },
